@@ -25,9 +25,6 @@ app.get("/get-students", async (req, res) => {
         {
           model: Course,
           required: true,
-          on: {
-            courseID: sequelize.col("course.id"), // Assuming your foreign key is named 'courseID'
-          },
         },
       ],
     });
@@ -41,13 +38,14 @@ app.get("/get-students", async (req, res) => {
 
 app.post("/create-student", async (req, res) => {
   try {
-    const { name, dob, major, gender, contact_number } = req.body;
+    const { name, dob, major, gender, contact_number, courseID } = req.body;
     const studentsData = await Student.create({
       name,
       dob,
       major,
       gender,
       contact_number,
+      courseID,
     });
     res.json({ "Student Created": studentsData });
   } catch (err) {
