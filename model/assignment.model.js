@@ -1,32 +1,32 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../configs/db");
-const { Department } = require("./department.model");
+const { Course } = require("./course.model");
 
-const Course = sequelize.define(
-  "courses",
+const Assignment = sequelize.define(
+  "assignments",
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    image: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    dept_id: {
+    due_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    course_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Department,
+        model: Course,
         key: "id",
       },
       onDelete: "CASCADE",
@@ -37,4 +37,4 @@ const Course = sequelize.define(
   }
 );
 
-module.exports = { Course };
+module.exports = { Assignment };

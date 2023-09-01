@@ -1,8 +1,21 @@
 const express = require("express");
 const { sequelize } = require("./configs/db");
-const { Student } = require("./model/user.model");
-const { Course } = require("./model/course.model");
+const { Student } = require("./model/student.model");
 const jwt = require("jsonwebtoken");
+const { Department } = require("./model/department.model");
+const { Course } = require("./model/course.model");
+const { Enrollment } = require("./model/enrollment.model");
+const { Instructor } = require("./model/instructor.model");
+const { Assignment } = require("./model/assignment.model");
+const { Submission } = require("./model/submissions.model");
+const { Sequelize } = require("sequelize");
+const { studentRouter } = require("./routes/student.route");
+const { assignmentRouter } = require("./routes/assignment.route");
+const { courseRouter } = require("./routes/course.route");
+const { departmentRouter } = require("./routes/department.route");
+const { enrollmentRouter } = require("./routes/enrollment.route");
+const { instructorRouter } = require("./routes/instructor.route");
+const { submissionRouter } = require("./routes/submission.route");
 
 const app = express();
 
@@ -18,54 +31,13 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.get("/get-students", async (req, res) => {
-  try {
-    const studentsData = await Student.findAll({
-      include: [
-        {
-          model: Course,
-          required: true,
-        },
-      ],
-    });
-
-    res.json({ Data: studentsData });
-  } catch (err) {
-    console.error("Error fetching students:", err);
-    res.send({ error: err.message });
-  }
-});
-
-app.post("/create-student", async (req, res) => {
-  try {
-    const { name, dob, major, gender, contact_number, courseID } = req.body;
-    const studentsData = await Student.create({
-      name,
-      dob,
-      major,
-      gender,
-      contact_number,
-      courseID,
-    });
-    res.json({ "Student Created": studentsData });
-  } catch (err) {
-    console.error("Error fetching students:", err);
-    res.send({ error: err.message });
-  }
-});
-
-app.post("/create-course", async (req, res) => {
-  try {
-    const { name } = req.body;
-    const course = await Course.create({
-      name,
-    });
-    res.json({ course });
-  } catch (err) {
-    console.error(err);
-    res.send({ error: err.message });
-  }
-});
+app.use("", studentRouter);
+app.use("", courseRouter);
+app.use("", departmentRouter);
+app.use("", enrollmentRouter);
+app.use("", instructorRouter);
+app.use("", submissionRouter);
+app.use("", assignmentRouter);
 
 sequelize
   .sync()
