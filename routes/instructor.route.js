@@ -126,6 +126,35 @@ instructorRouter.get(
   }
 );
 
+// -- get all the courses which are not assigned to instructor
+instructorRouter.get("/api/instructor/course/available", async (req, res) => {
+  try {
+    Course.hasOne(Instructor, { foreignKey: "course_id" });
+    Instructor.belongsTo(Course, { foreignKey: "course_id" });
+
+    const query = `
+          SELECT courses.*
+          FROM courses
+          LEFT JOIN instructors ON courses.id = instructors.course_id
+          WHERE instructors.course_id IS NULL;
+        `;
+
+    const coursesAvailableToAssignInstructor = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+    });
+
+    if (coursesAvailableToAssignInstructor.length === 0)
+      return res.json({
+        message: "No courses available to enroll!",
+      });
+
+    res.json(coursesAvailableToAssignInstructor);
+  } catch (err) {
+    console.error("Error fetching courses:", err);
+    res.send({ error: err.message });
+  }
+});
+
 module.exports = {
   instructorRouter,
 };
