@@ -15,7 +15,7 @@ const Instructor = sequelize.define(
       allowNull: false,
     },
     gender: {
-      type: DataTypes.ENUM("Male", "Female"),
+      type: DataTypes.ENUM("Male", "Female", "Others"),
       allowNull: false,
     },
     email: {

@@ -20,7 +20,7 @@ const Student = sequelize.define(
     gender: {
       type: DataTypes.ENUM,
       allowNull: false,
-      values: ["Male", "Female"],
+      values: ["Male", "Female", "Others"],
     },
     dob: {
       type: DataTypes.DATEONLY,
@@ -29,7 +29,15 @@ const Student = sequelize.define(
     major: {
       type: DataTypes.ENUM,
       allowNull: false,
-      values: ["Computer Science", "Engineering", "Mathematics", "Physics"],
+      values: [
+        "Applied Sciences",
+        "Fine Arts",
+        "Environmental Engineering",
+        "Biotechnology",
+        "Electronics",
+        "Engineering",
+        "Computer Science",
+      ],
     },
     email: {
       type: DataTypes.STRING,
