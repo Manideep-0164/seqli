@@ -16,6 +16,7 @@ const { departmentRouter } = require("./routes/department.route");
 const { enrollmentRouter } = require("./routes/enrollment.route");
 const { instructorRouter } = require("./routes/instructor.route");
 const { submissionRouter } = require("./routes/submission.route");
+const { adminRouter } = require("./routes/admin.route");
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("", departmentRouter);
 app.use("", enrollmentRouter);
 app.use("", instructorRouter);
 app.use("", submissionRouter);
+app.use("", adminRouter);
 app.use("", assignmentRouter);
 
 sequelize
