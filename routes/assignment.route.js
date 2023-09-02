@@ -126,12 +126,12 @@ assignmentRouter.get(
       Assignment.belongsTo(Course, { foreignKey: "course_id" });
 
       const query = `
-            SELECT a.*, c.name, sb.submission_date, sb.status
+            SELECT a.*, c.name AS course, sb.submission_date, sb.status
             FROM assignments a
             JOIN courses c ON a.course_id = c.id
             JOIN enrollments e ON c.id = e.course_id
             JOIN students s ON e.student_id = s.id
-            JOIN submissions sb ON s.id = sb.student_id
+            LEFT JOIN submissions sb ON s.id = sb.student_id
             WHERE s.id = :studentId
         `;
 
