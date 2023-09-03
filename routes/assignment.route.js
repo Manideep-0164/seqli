@@ -153,6 +153,29 @@ assignmentRouter.get(
   }
 );
 
+// get an assignment
+assignmentRouter.get(
+  "/api/assignment/:id",
+  authorize(["student", "instructor", "admin"]),
+  async (req, res) => {
+    try {
+      const assignment = await Assignment.findOne({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      if (!assignment)
+        return res.status(404).json({ message: "No assignment found!" });
+
+      return res.json(assignment);
+    } catch (error) {
+      console.log("Error fetching assignment:".error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
+);
+
 // delete an assignment
 assignmentRouter.delete(
   "/api/assignment/:id",
