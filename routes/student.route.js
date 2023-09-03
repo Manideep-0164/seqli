@@ -91,18 +91,22 @@ studentRouter.post("/api/student/signin", async (req, res) => {
 });
 
 // -- Obtain the list of students who are part of a course that has been assigned to an instructor.
-studentRouter.get("/api/student/course/instructor/:id", async (req, res) => {
-  try {
-    Student.hasMany(Enrollment, { foreignKey: "student_id" });
-    Enrollment.belongsTo(Student, { foreignKey: "student_id" });
+studentRouter.get(
+  "/api/student/course/instructor/:id",
+  authentication,
+  authorize(["instructor", "admin"]),
+  async (req, res) => {
+    try {
+      Student.hasMany(Enrollment, { foreignKey: "student_id" });
+      Enrollment.belongsTo(Student, { foreignKey: "student_id" });
 
-    Course.hasMany(Enrollment, { foreignKey: "course_id" });
-    Enrollment.belongsTo(Course, { foreignKey: "course_id" });
+      Course.hasMany(Enrollment, { foreignKey: "course_id" });
+      Enrollment.belongsTo(Course, { foreignKey: "course_id" });
 
-    Course.hasOne(Instructor, { foreignKey: "course_id" });
-    Instructor.belongsTo(Course, { foreignKey: "course_id" });
+      Course.hasOne(Instructor, { foreignKey: "course_id" });
+      Instructor.belongsTo(Course, { foreignKey: "course_id" });
 
-    const query = `
+      const query = `
         SELECT s.name, s.gender, s.major, s.contact_number, c.name as course
         FROM students s
         JOIN enrollments e ON s.id = e.student_id
@@ -111,20 +115,21 @@ studentRouter.get("/api/student/course/instructor/:id", async (req, res) => {
         WHERE i.id = :instructorID
     `;
 
-    const students = await sequelize.query(query, {
-      type: Sequelize.QueryTypes.SELECT,
-      replacements: { instructorID: req.params.id },
-    });
+      const students = await sequelize.query(query, {
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: { instructorID: req.params.id },
+      });
 
-    if (students.length === 0)
-      return res.json({ message: "No students enrolled to this course." });
+      if (students.length === 0)
+        return res.json({ message: "No students enrolled to this course." });
 
-    return res.json(students);
-  } catch (error) {
-    console.log("Error fetching the students:", error);
-    res.status(500).json({ error: error.message });
+      return res.json(students);
+    } catch (error) {
+      console.log("Error fetching the students:", error);
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 module.exports = {
   studentRouter,
