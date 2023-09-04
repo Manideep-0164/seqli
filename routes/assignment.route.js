@@ -131,7 +131,12 @@ assignmentRouter.get(
             JOIN courses c ON a.course_id = c.id
             JOIN enrollments e ON c.id = e.course_id
             JOIN students s ON e.student_id = s.id
-            LEFT JOIN submissions sb ON s.id = sb.student_id
+            LEFT JOIN (
+                SELECT assignment_id, student_id, MAX(submission_date) AS latest_submission_date
+                FROM submissions
+                GROUP BY assignment_id, student_id
+            ) ls ON a.id = ls.assignment_id AND s.id = ls.student_id
+            LEFT JOIN submissions sb ON ls.assignment_id = sb.assignment_id AND ls.student_id = sb.student_id AND ls.latest_submission_date = sb.submission_date
             WHERE s.id = :studentId
         `;
 
