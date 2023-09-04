@@ -164,10 +164,21 @@ assignmentRouter.get(
   authorize(["student", "instructor", "admin"]),
   async (req, res) => {
     try {
-      const assignment = await Assignment.findOne({
-        where: {
-          id: req.params.id,
-        },
+      const query = `
+            SELECT a.*, s.submission_date, s.status, s.submittedData
+            FROM assignments a
+            LEFT JOIN (
+                SELECT assignment_id, MAX(submission_date) AS latest_submission_date
+                FROM submissions
+                WHERE assignment_id = :assignmentId
+                GROUP BY assignment_id
+            ) ls ON a.id = ls.assignment_id
+            LEFT JOIN submissions s ON a.id = s.assignment_id AND s.submission_date = ls.latest_submission_date
+            WHERE a.id = :assignmentId;
+      `;
+      const assignment = await sequelize.query(query, {
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: { assignmentId: req.params.id },
       });
 
       if (!assignment)
