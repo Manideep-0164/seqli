@@ -65,7 +65,7 @@ adminRouter.post("/api/admin/signin", async (req, res) => {
       email: adminExist.email,
     };
     const token = jwt.sign(payload, process.env.ADMIN_SECRET, {
-      expiresIn: "1H",
+      expiresIn: "12H",
     });
 
     res.json({
