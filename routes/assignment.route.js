@@ -159,12 +159,23 @@ assignmentRouter.get(
 
 // get an assignment
 assignmentRouter.get(
-  "/api/assignment/:id",
+  "/api/assignment/:aID/student/:sID",
   authorize(["student", "instructor", "admin"]),
   async (req, res) => {
     try {
+      const { sID, aID } = req.params;
+
       const query = `
-            SELECT a.*, s.submission_date, s.status, s.submittedData
+        SELECT a.*, s.submission_date, s.status, s.submittedData
+        FROM submissions s
+        JOIN assignments a ON s.assignment_id = a.id
+        WHERE a.id = assignmentId AND s.student_id = studentID
+        ORDER BY submission_date DESC
+        LIMIT 1;
+      `;
+
+      /*
+      SELECT a.*, s.submission_date, s.status, s.submittedData
             FROM assignments a
             LEFT JOIN (
                 SELECT assignment_id, MAX(submission_date) AS latest_submission_date
@@ -174,10 +185,10 @@ assignmentRouter.get(
             ) ls ON a.id = ls.assignment_id
             LEFT JOIN submissions s ON a.id = s.assignment_id AND s.submission_date = ls.latest_submission_date
             WHERE a.id = :assignmentId;
-      `;
+      */
       const assignment = await sequelize.query(query, {
         type: Sequelize.QueryTypes.SELECT,
-        replacements: { assignmentId: req.params.id },
+        replacements: { assignmentId: aID, studentId: sID },
       });
 
       if (!assignment)
