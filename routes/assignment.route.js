@@ -157,7 +157,7 @@ assignmentRouter.get(
   }
 );
 
-// get an assignment
+// get an assignment with its submission details
 assignmentRouter.get(
   "/api/assignment/:aID/student/:sID",
   authorize(["student", "instructor", "admin"]),
@@ -166,12 +166,14 @@ assignmentRouter.get(
       const { sID, aID } = req.params;
 
       const query = `
-        SELECT a.*, s.submission_date, s.status, s.submittedData
-        FROM submissions s
-        JOIN assignments a ON s.assignment_id = a.id
-        WHERE a.id = :assignmentId AND s.student_id = :studentId
-        ORDER BY submission_date DESC
-        LIMIT 1;
+      SELECT a.*, sub.submission_date, sub.status, sub.submittedData
+      FROM assignments a
+      JOIN enrollments e ON a.course_id = e.course_id
+      JOIN students s ON e.student_id = s.id
+      LEFT JOIN submissions sub ON sub.assignment_id = a.id
+      WHERE a.id = :assignmentId AND s.id = :studentId
+      ORDER BY submission_date DESC
+      LIMIT 1;
       `;
 
       /*
@@ -185,19 +187,49 @@ assignmentRouter.get(
             ) ls ON a.id = ls.assignment_id
             LEFT JOIN submissions s ON a.id = s.assignment_id AND s.submission_date = ls.latest_submission_date
             WHERE a.id = :assignmentId;
+
+      SELECT a.*, s.submission_date, s.status, s.submittedData
+        FROM submissions s
+        JOIN assignments a ON s.assignment_id = a.id
+        WHERE a.id = :assignmentId AND s.student_id = :studentId
+        ORDER BY submission_date DESC
+        LIMIT 1;
       */
       const assignment = await sequelize.query(query, {
         type: Sequelize.QueryTypes.SELECT,
         replacements: { assignmentId: aID, studentId: sID },
       });
 
-      if (!assignment)
+      if (assignment.length === 0)
         return res.status(404).json({ message: "No assignment found!" });
 
       return res.json(assignment);
     } catch (error) {
       console.log("Error fetching assignment:".error);
       return res.status(500).json({ error: error.message });
+    }
+  }
+);
+
+// get a single assignment
+assignmentRouter.get(
+  "/api/assignment/:id",
+  authorize(["instructor", "admin"]),
+  async (req, res) => {
+    try {
+      const isAssignmentExist = await Assignment.findOne({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      if (!isAssignmentExist)
+        return res.status(404).json({ message: "Assignment does not exist." });
+
+      res.json(isAssignmentExist);
+    } catch (err) {
+      console.error("Error fetching assignments:", err);
+      res.send({ error: err.message });
     }
   }
 );
