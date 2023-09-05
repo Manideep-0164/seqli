@@ -126,18 +126,17 @@ assignmentRouter.get(
       Assignment.belongsTo(Course, { foreignKey: "course_id" });
 
       const query = `
-            SELECT a.*, c.name AS course, sb.submission_date, sb.status
-            FROM assignments a
-            JOIN courses c ON a.course_id = c.id
-            JOIN enrollments e ON c.id = e.course_id
-            JOIN students s ON e.student_id = s.id
-            LEFT JOIN (
-                SELECT assignment_id, student_id, MAX(submission_date) AS latest_submission_date
-                FROM submissions
-                GROUP BY assignment_id, student_id
-            ) ls ON a.id = ls.assignment_id AND s.id = ls.student_id
-            LEFT JOIN submissions sb ON ls.assignment_id = sb.assignment_id AND ls.student_id = sb.student_id AND ls.latest_submission_date = sb.submission_date
-            WHERE s.id = :studentId
+          SELECT a.*, c.name AS course, sub.submission_date, sub.status
+          FROM assignments a
+          JOIN courses c ON a.course_id = c.id
+          JOIN enrollments e ON c.id = e.course_id
+          JOIN students s ON e.student_id = s.id
+          LEFT JOIN (
+            SELECT assignment_id, student_id, submission_date, status,
+                  ROW_NUMBER() OVER (PARTITION BY assignment_id, student_id ORDER BY submission_date DESC) AS rn
+            FROM submissions
+          ) sub ON a.id = sub.assignment_id AND s.id = sub.student_id AND sub.rn = 1
+          WHERE s.id = :studentId
         `;
 
       const studentAssignmentData = await sequelize.query(query, {
