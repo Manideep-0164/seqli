@@ -169,7 +169,7 @@ assignmentRouter.get(
         SELECT a.*, s.submission_date, s.status, s.submittedData
         FROM submissions s
         JOIN assignments a ON s.assignment_id = a.id
-        WHERE a.id = assignmentId AND s.student_id = studentID
+        WHERE a.id = :assignmentId AND s.student_id = :studentID
         ORDER BY submission_date DESC
         LIMIT 1;
       `;
