@@ -57,7 +57,7 @@ departmentRouter.get("/api/department/courses", async (req, res) => {
       include: {
         model: Course,
         as: "courses",
-        attributes: ["id", "name", "description"], // Select the attributes you want
+        attributes: ["id", "name", "description"],
       },
     });
 
