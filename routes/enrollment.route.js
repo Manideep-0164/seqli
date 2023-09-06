@@ -73,6 +73,16 @@ enrollmentRouter.post(
   async (req, res) => {
     try {
       const { enroll_date, student_id, course_id } = req.body;
+
+      const isEnrolled = await Enrollment.findOne({
+        where: {
+          student_id: student_id,
+          course_id: course_id,
+        },
+      });
+
+      if (isEnrolled) return res.json({ message: "Already enrolled!" });
+
       const enrollMents = await Enrollment.create({
         enroll_date,
         student_id,
