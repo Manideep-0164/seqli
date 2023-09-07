@@ -159,9 +159,9 @@ chatRouter.post(
       
      **note: genreate content relate to the topic not above example and dont genertate in normal format,jsut return the html format nohting else `;
 
-      const response = await makeOpenAIRequest(prompt);
-
-      res.json(response);
+      // const response = await makeOpenAIRequest(prompt);
+      res.json({ key: process.env.OPENAI_API });
+      // res.json(response);
     } catch (error) {
       res.status(500).json({ error: "Something went wrong." });
     }
