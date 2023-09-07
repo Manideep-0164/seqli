@@ -135,7 +135,7 @@ chatRouter.get("/api/ai/chat", async (req, res) => {
 chatRouter.get(
   "/api/ai/assignment",
   authentication,
-  authorize(["instructor", "admin"]),
+  authorize(["instructor", "admin", "student"]),
   async (req, res) => {
     try {
       let { course, concept, level } = req.body;
