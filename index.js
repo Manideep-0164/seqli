@@ -37,35 +37,35 @@ app.use("", adminRouter);
 app.use("", announcementRouter);
 app.use("", assignmentRouter);
 
-// sequelize
-//   .sync()
-//   .then(() => {
-//     app.listen(1400, async () => {
-//       console.log("Connected to DB");
-//       console.log("Server is running at 1400");
-//     });
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
-
-client.connect();
-
-client.on("connect", async () => {
-  console.log("Connected to redis");
-  try {
-    await sequelize.sync();
-    console.log("Connected to DB");
+sequelize
+  .sync()
+  .then(() => {
     app.listen(1400, async () => {
+      console.log("Connected to DB");
       console.log("Server is running at 1400");
     });
-  } catch (error) {
-    console.error("Error during Sequelize sync or server listening:", err);
-  }
-});
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-client.on("error", (err) => {
-  console.log("Redis error =>", err);
-});
+// client.connect();
+
+// client.on("connect", async () => {
+//   console.log("Connected to redis");
+//   try {
+//     await sequelize.sync();
+//     console.log("Connected to DB");
+//     app.listen(1400, async () => {
+//       console.log("Server is running at 1400");
+//     });
+//   } catch (error) {
+//     console.error("Error during Sequelize sync or server listening:", err);
+//   }
+// });
+
+// client.on("error", (err) => {
+//   console.log("Redis error =>", err);
+// });
 
 module.exports = app;

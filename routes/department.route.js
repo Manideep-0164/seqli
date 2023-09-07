@@ -48,9 +48,9 @@ departmentRouter.get("/api/department/courses", async (req, res) => {
     Department.hasMany(Course, { foreignKey: "dept_id" });
     Course.belongsTo(Department, { foreignKey: "dept_id" });
 
-    const cache = await client.get("dept/courses");
+    // const cache = await client.get("dept/courses");
 
-    if (cache !== null) return res.json(JSON.parse(cache));
+    // if (cache !== null) return res.json(JSON.parse(cache));
 
     const departmentCourses = await Department.findAll({
       attributes: ["name"],
@@ -61,12 +61,12 @@ departmentRouter.get("/api/department/courses", async (req, res) => {
       },
     });
 
-    await client.set(
-      "dept/courses",
-      JSON.stringify(departmentCourses),
-      "EX",
-      3600
-    );
+    // await client.set(
+    //   "dept/courses",
+    //   JSON.stringify(departmentCourses),
+    //   "EX",
+    //   3600
+    // );
     res.json(departmentCourses);
   } catch (err) {
     console.error("Error fetching courses:", err);
