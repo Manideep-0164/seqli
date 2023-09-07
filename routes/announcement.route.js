@@ -87,6 +87,40 @@ announcementRouter.get(
   }
 );
 
+// get the announcements based on the student enrolled courses using student id
+announcementRouter.get(
+  "/api/announcement/student/:id",
+  authentication,
+  authorize(["student", "instructor", "admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const query = `
+        SELECT a.*
+        FROM announcements a
+        JOIN courses c ON c.id = a.course_id
+        JOIN enrollments e ON e.course_id = c.id
+        JOIN students s ON s.id = e.student_id
+        WHERE s.id = :studentId;
+    `;
+
+      const announcementsOfStudentCourses = await sequelize.query(query, {
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: { studentId: id },
+      });
+
+      if (announcementsOfStudentCourses.length === 0)
+        return res.status(404).json({ message: "No announcements found." });
+
+      return res.json(announcementsOfStudentCourses);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
+
 announcementRouter.get(
   "/api/announcement/:id",
   authentication,
