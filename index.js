@@ -12,6 +12,7 @@ const { instructorRouter } = require("./routes/instructor.route");
 const { submissionRouter } = require("./routes/submission.route");
 const { adminRouter } = require("./routes/admin.route");
 const { announcementRouter } = require("./routes/announcement.route");
+const { chatRouter } = require("./routes/chat.route");
 
 app.use(cors());
 app.use(express.json());
@@ -25,6 +26,7 @@ app.get("/", async (req, res) => {
   }
 });
 
+app.use("", chatRouter);
 app.use("", studentRouter);
 app.use("", courseRouter);
 app.use("", departmentRouter);
